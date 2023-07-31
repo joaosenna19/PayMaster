@@ -1,11 +1,17 @@
-﻿namespace PayMaster;
+﻿using PayMaster.Data;
+
+namespace PayMaster;
 
 public partial class App : Application
+
 {
-    public App()
+    public static HourlyEmployeeRepository Repo { get; private set; }
+    public App(HourlyEmployeeRepository repo)
     {
         InitializeComponent();
 
         MainPage = new MainPage();
+
+        Repo = repo;
     }
 }

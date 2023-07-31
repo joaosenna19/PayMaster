@@ -1,9 +1,7 @@
-﻿@page "/edit"
+﻿@page "/"
 @using PayMaster.Data
-<h3>Edit</h3>
 
-
-@*<div class="container-fluid">
+<div class="container-fluid">
   <div class="row my-2">
     <h2 class="text-center">Add Employee</h2>
   </div>
@@ -23,32 +21,41 @@
       </div>
       <div class="row m-4">
         <label for="date_hired" class="input-group-text input-group-sm form-label">Date Hired:</label>
-        <input type="date" id="date_hired" name="date_hired"  min="2022-01-01" class="form-control" required @bind="dateHired">
+        <input type="date" id="date_hired" name="date_hired" value="2022-01-01" min="2022-01-01" class="form-control" required @bind="dateHired">
       </div>
       <div class="row m-4">
         <label for="hourly_rate" class="input-group-text input-group-sm form-label">Hourly Rate:</label>
         <input type="number" id="hourly_rate" name="hourly_rate" min="0.01" step="0.01" class="form-control" required @bind="hourlyRate">
       </div>
       <div class="row m-4">
-        <button type="button" class="btn btn-primary btn-sm w-100 btn-block" onclick="">
+        <button type="button" class="btn btn-primary btn-sm w-100 btn-block" onclick="@AddEmployee">
           Add Employee
         </button>
       </div>
     </form>
   </div>
-</div>*@
+</div>
 
 @code {
 
-  List<HourlyEmployee> listOfEmployees;
-
-  protected override void OnInitialized()
+  string firstName;
+  string lastName;
+  string position;
+  DateTime dateHired;
+  double hourlyRate;
+  List<HourlyEmployee>? listOfEmployees;
+  
+  private async void AddEmployee()
   {
-    GetAllEmployees();
-  }
-
-  private async void GetAllEmployees()
-  {
-    listOfEmployees = await App.Repo.GetEmployees();
+    var newEmployee = new HourlyEmployee
+    {
+      FirstName = firstName,
+      LastName = lastName,
+      Position = position,
+      DateHired = dateHired,
+      HourlyRate = hourlyRate
+    };
+    await App.Repo.CreateEmployee(newEmployee);
+    App.Current.MainPage.DisplayAlert("Sucess", App.Repo.StatusMessage, "Close");
   }
 }

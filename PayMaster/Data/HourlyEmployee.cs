@@ -1,13 +1,17 @@
-﻿namespace PayMaster.Data;
+﻿using SQLite;
 
-public class HourlyEmployee : Employee
+namespace PayMaster.Data;
+
+public class HourlyEmployee
 {
-    private double HourlyRate { get; set; }
-    
-    public HourlyEmployee(int id, string firstName, string lastName, string position, bool isActive, DateTime dateHired, double hourlyRate) 
-        : base(id, firstName, lastName, position, isActive, dateHired)
-    {
-        HourlyRate = hourlyRate;
-    }
+    [PrimaryKey, AutoIncrement]
+    public int Id { get; set; }
+    public string FirstName { get; set; }
+    public string LastName { get; set; }
+    public string Position { get; set; }
+    public bool IsActive { get; set; }
+    public DateTime DateHired { get; set; }
+    public DateTime DateFired { get; set; }
+    public double HourlyRate { get; set; }
     
 }

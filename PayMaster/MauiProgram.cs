@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using PayMaster;
+using PayMaster.Data;
 
 namespace PayMaster;
 
@@ -13,14 +14,14 @@ public static class MauiProgram
             .ConfigureFonts(fonts => { fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular"); });
 
         builder.Services.AddMauiBlazorWebView();
+        
 
 #if DEBUG
         builder.Services.AddBlazorWebViewDeveloperTools();
         builder.Logging.AddDebug();
 #endif
-
-        /*builder.Services.AddSingleton<WeatherForecastService>();*/
-
+        var dbPath = Path.Combine(FileSystem.AppDataDirectory, "employees.db");
+        builder.Services.AddSingleton(s => ActivatorUtilities.CreateInstance<HourlyEmployeeRepository>(s, dbPath));
         return builder.Build();
     }
 }

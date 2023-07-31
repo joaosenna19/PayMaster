@@ -50,11 +50,17 @@
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.1" />
         <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="7.0.0" />
+        <PackageReference Include="sqlite-net-pcl" Version="1.9.141-beta" />
+        <PackageReference Include="SQLitePCLRaw.bundle_green" Version="2.1.5" />
+        <PackageReference Include="SQLitePCLRaw.core" Version="2.1.5" />
+        <PackageReference Include="SQLitePCLRaw.provider.dynamic_cdecl" Version="2.1.5" />
+        <PackageReference Include="SQLitePCLRaw.provider.e_sqlite3" Version="2.1.5" />
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Data" />
+      <Compile Remove="Data\Employee.cs" />
     </ItemGroup>
 
 </Project>
