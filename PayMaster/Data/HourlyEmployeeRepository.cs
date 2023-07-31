@@ -42,9 +42,8 @@ namespace PayMaster.Data;
             try
             {
                 await Init();
-                StatusMessage = $"{employee.FirstName + employee.LastName} added.";
+                StatusMessage = $"{employee.FirstName} {employee.LastName} added.";
                 await _database.InsertAsync(employee);
-                
             }
             catch (Exception e)
             {

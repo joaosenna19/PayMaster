@@ -2,45 +2,51 @@
 @using PayMaster.Data
 <h3>Edit</h3>
 
-
-@*<div class="container-fluid">
+<!-- Employee search -->
+<div class="container-fluid">
   <div class="row my-2">
-    <h2 class="text-center">Add Employee</h2>
+    <h2 class="text-center">Edit Employee</h2>
   </div>
-  <div class="row my-1">
-    <form class="-flex flex-column my-1">
-      <div class="row m-4">
-        <label for="first_name" class="input-group-text input-group-sm form-label">First Name:</label>
-        <input type="text" id="first_name" name="first_name" class="form-control" required @bind="firstName">
+  <div class="row">
+    <form class="d-flex flex-row my-1">
+      <div class="col mx-1">
+        <label for="code" class="form-label">First name:</label>
+        <input type="text" id="code" class="form-control form-control-sm" @bind="firstName">
       </div>
-      <div class="row m-4">
-        <label for="last_name" class="input-group-text input-group-sm form-label">Last Name:</label>
-        <input type="text" id="last_name" name="last_name" class="form-control" required @bind="lastName">
+      <div class="col mx-1">
+        <label for="airline" class="form-label">Last name:</label>
+        <input type="text" id="airline" class="form-control form-control-sm" @bind="lastName">
       </div>
-      <div class="row m-4">
-        <label for="position" class="input-group-text input-group-sm form-label">Position:</label>
-        <input type="text" id="position" name="position" class="form-control" required @bind="position">
-      </div>
-      <div class="row m-4">
-        <label for="date_hired" class="input-group-text input-group-sm form-label">Date Hired:</label>
-        <input type="date" id="date_hired" name="date_hired"  min="2022-01-01" class="form-control" required @bind="dateHired">
-      </div>
-      <div class="row m-4">
-        <label for="hourly_rate" class="input-group-text input-group-sm form-label">Hourly Rate:</label>
-        <input type="number" id="hourly_rate" name="hourly_rate" min="0.01" step="0.01" class="form-control" required @bind="hourlyRate">
-      </div>
-      <div class="row m-4">
-        <button type="button" class="btn btn-primary btn-sm w-100 btn-block" onclick="">
-          Add Employee
+      <div class="col align-self-end">
+        <button type="button" class="btn btn-primary btn-sm w-100 btn-block" onclick="@SearchEmployee">
+          Search employee
         </button>
       </div>
     </form>
   </div>
-</div>*@
+</div>
+
+<!-- Display results -->
+<div>
+        <div class="row my-2">
+            <h2 class="text-center">Employees</h2>
+          </div>
+        <div class="col">
+          <select class="form-select form-select-sm">
+            <option readonly="default">Employees</option>
+            @foreach (var e in matchingEmployees)
+            {
+              <option value="@e.FirstName">@e.FirstName @e.LastName</option>
+            }
+          </select>
+        </div>
+      </div>
 
 @code {
-
+  string firstName;
+  string lastName;
   List<HourlyEmployee> listOfEmployees;
+  List<HourlyEmployee> matchingEmployees = new();
 
   protected override void OnInitialized()
   {
@@ -50,5 +56,27 @@
   private async void GetAllEmployees()
   {
     listOfEmployees = await App.Repo.GetEmployees();
+  }
+
+  private void SearchEmployee()
+  {
+    matchingEmployees.Clear();
+
+    if (string.IsNullOrEmpty(firstName) && string.IsNullOrEmpty(lastName))
+    {
+      matchingEmployees.AddRange(listOfEmployees);
+    }
+    else
+    {
+      matchingEmployees.AddRange(listOfEmployees.Where
+        (employee => (string.IsNullOrEmpty(firstName) || employee.FirstName == firstName) &&
+                     (string.IsNullOrEmpty(lastName) || employee.LastName == lastName)));
+    }
+
+    if (matchingEmployees.Count == 0) App.Current.MainPage.DisplayAlert("No results found", "No matching results", "Close");
+
+    firstName = null;
+    lastName = null;
+
   }
 }
