@@ -49,9 +49,9 @@
   {
     var newEmployee = new HourlyEmployee
     {
-      FirstName = firstName,
-      LastName = lastName,
-      Position = position,
+      FirstName = firstName.ToLower().Trim(),
+      LastName = lastName.ToLower().Trim(),
+      Position = position.ToLower().Trim(),
       DateHired = dateHired,
       HourlyRate = hourlyRate
     };
