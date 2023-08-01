@@ -1,11 +1,9 @@
-﻿@page "/edit"
+﻿@page "/Calculate"
 @using PayMaster.Data
-@inject IJSRuntime JSRuntime
 
-<!-- Employee search -->
 <div class="container-fluid">
   <div class="row my-2">
-    <h2 class="text-center">Edit Employee</h2>
+    <h2 class="text-center">Calculate Salary</h2>
   </div>
   <div class="row">
     <form class="d-flex flex-row my-1">
@@ -28,23 +26,23 @@
 
 <!-- Display results -->
 <div class="row my-y">
-<form class="d-flex flex-column my-1">
-<div>
-  <div class="row my-2">
-    <h2 class="text-center">Employees</h2>
-  </div>
-  <div class="col">
-    <select class="form-select form-select-sm" @bind="matchingEmployeeId">
-      <option readonly="default">Employees</option>
-      @foreach (var e in matchingEmployees)
-      {
-        <option value="@e.Id">@e.FirstName @e.LastName</option>
-      }
-    </select>
-  </div>
+  <form class="d-flex flex-column my-1">
+    <div>
+      <div class="row my-2">
+        <h2 class="text-center">Employees</h2>
+      </div>
+      <div class="col">
+        <select class="form-select form-select-sm" @bind="matchingEmployeeId">
+          <option readonly="default">Employees</option>
+          @foreach (var e in matchingEmployees)
+          {
+            <option value="@e.Id">@e.FirstName @e.LastName</option>
+          }
+        </select>
+      </div>
+    </div>
+  </form>
 </div>
-
-<!-- Display employee information -->
 
 <div class="row m-1">
   <label for="firstname" class="input-group-text input-group-sm form-label">First Name:</label>
@@ -55,45 +53,29 @@
   <input type="text" value="@selectedEmployee?.LastName.ToUpper()" placeholder="Last name" class="form-control" id="lastname" readonly>
 </div>
 <div class="row m-1">
-      <label for="datehired" class="input-group-text input-group-sm form-label">Date Hired:</label>
-      <input type="date" bind="@selectedEmployee?.DateHired.ToString("yyyy-MM-dd")" class="form-control" id="datehired" readonly>
-    </div>
-<div class="row m-1">
   <label for="hourly_rate" class="input-group-text input-group-sm form-label">Hourly Rate:</label>
   @if (selectedEmployee != null)
   {
-    <input type="number" id="hourly_rate_selected" name="hourly_rate" min="0.01" step="0.01" class="form-control" required @bind="@selectedEmployee.HourlyRate">
+    <input type="number" id="hourly_rate_selected" name="hourly_rate" min="0.01" step="0.01" class="form-control" required value="@selectedEmployee.HourlyRate">
   }
   else
   {
     <input type="number" id="hourly_rate_placeholder" name="hourly_rate" min="0.01" step="0.01" class="form-control" placeholder="Hourly Rate">
   }
+</div>
+<div class="row m-1">
+  <label for="hoursworked" class="input-group-text input-group-sm form-label">Hours Worked Bi-weekly:</label>
+  <input type="number" @bind="hoursWorked" placeholder="Hours worked" class="form-control" id="hoursworked" min="1" step="1" required>
+</div>
+<div class="row m-1">
+  <button class="btn btn-success btn-sm w-100 btn-block" type="button" onclick="@CalculateSalary">Calculate salary</button>
   
-</div>
-<div class="row m-1">
-  <label for="position" class="input-group-text input-group-sm form-label">Position:</label>
-  @if (selectedEmployee != null)
-    {
-      <input type="text" id="position" name="position" class="form-control" required @bind="@selectedEmployee.Position">
-    }
-    else
-    {
-      <input type="text" id="position_placeholder" class="form-control" name="position" placeholder="Position">
-    }
-     
-</div>
-<div class="row m-1">
-  <button class="btn btn-primary btn-sm w-100 btn-block" type="button" onclick="@UpdateEmployee">Update employee</button>
-</div>
-<div class="row m-1">
-  <button class="btn btn-warning btn-sm w-100 btn-block" type="submit" onclick="@FireEmployee">Fire employee</button>
-</div>
-<div class="row m-1">
-  <button class="btn btn-danger btn-sm w-100 btn-block" type="submit" onclick="@DeleteEmployee">Delete employee</button>
+  @if (salary != 0)
+  {
+    <p class="row m-4 border border-success border-1 text-center">Bi-weekly salary: $@salary</p>
+  }
 </div>
 
-  </form>
-</div>
 
 
 @code {
@@ -103,7 +85,9 @@
   List<HourlyEmployee> matchingEmployees = new();
   int matchingEmployeeId;
   HourlyEmployee selectedEmployee => SelectedEmployee();
-
+  double hoursWorked;
+  double salary;
+  
   protected override void OnInitialized()
   {
     GetAllEmployees();
@@ -113,7 +97,7 @@
   {
     listOfEmployees = await App.Repo.GetEmployees();
   }
-
+  
   private void SearchEmployee()
   {
     matchingEmployees.Clear();
@@ -135,38 +119,13 @@
     lastName = null;
 
   }
-
+  
   private HourlyEmployee SelectedEmployee()
   {
     return listOfEmployees?.FirstOrDefault(employee => employee.Id == matchingEmployeeId);
   }
 
-  private async void DeleteEmployee()
-  {
-    if (selectedEmployee == null)
-    {
-      App.Current.MainPage.DisplayAlert("No employee selected", "Please select a employee first.", "Close");
-      return;
-    }
-    await App.Repo.DeleteEmployee(selectedEmployee);
-    App.Current.MainPage.DisplayAlert("Sucess", App.Repo.StatusMessage, "Close");
-    JSRuntime.InvokeVoidAsync("location.reload");
-    
-  }
-
-  private void FireEmployee()
-  {
-    if (selectedEmployee == null)
-    {
-      App.Current.MainPage.DisplayAlert("No employee selected", "Please select a employee first.", "Close");
-      return;
-    }
-    selectedEmployee.DateFired = DateTime.Today;
-    selectedEmployee.IsActive = false;
-    UpdateEmployee();
-  }
-  
-  private async void UpdateEmployee()
+  private void CalculateSalary()
   {
     if (selectedEmployee == null)
     {
@@ -174,8 +133,11 @@
       return;
     }
 
-    await App.Repo.UpdateEmployee(selectedEmployee);
-    App.Current.MainPage.DisplayAlert("Sucess", App.Repo.StatusMessage, "Close");
-    JSRuntime.InvokeVoidAsync("location.reload");
+    if (selectedEmployee.IsActive == false)
+    {
+      App.Current.MainPage.DisplayAlert("Fired employee", "The selected employee is no longer working for you.", "Close");
+      return;
+    }
+    salary = selectedEmployee.HourlyRate * hoursWorked;
   }
 }
