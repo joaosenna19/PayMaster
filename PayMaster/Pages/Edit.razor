@@ -28,25 +28,97 @@
 
 <!-- Display results -->
 <div>
-        <div class="row my-2">
-            <h2 class="text-center">Employees</h2>
-          </div>
-        <div class="col">
-          <select class="form-select form-select-sm">
-            <option readonly="default">Employees</option>
-            @foreach (var e in matchingEmployees)
+  <div class="row my-2">
+    <h2 class="text-center">Employees</h2>
+  </div>
+  <div class="col">
+    <select class="form-select form-select-sm" @bind="matchingEmployeeId">
+      <option readonly="default">Employees</option>
+      @foreach (var e in matchingEmployees)
+      {
+        <option value="@e.Id">@e.FirstName @e.LastName</option>
+      }
+    </select>
+  </div>
+</div>
+
+<!-- Display employee information -->
+<div class="row my-y">\
+  <form class="d-flex flex-column my-1">
+    <div class="row m-1">
+      <label for="firstname" class="input-group-text input-group-sm form-label">First Name:</label>
+      <input type="text" value="@selectedEmployee?.FirstName" placeholder="First Name" class="form-control" id="firstname" readonly>
+    </div>
+    <div class="row m-1">
+      <label for="lastname" class="input-group-text input-group-sm form-label">Last Name:</label>
+      <input type="text" value="@selectedEmployee?.LastName" placeholder="Last name" class="form-control" id="lastname" readonly>
+    </div>
+    <div class="row m-1">
+      <label for="position" class="input-group-text input-group-sm form-label">Position:</label>
+      <input type="text" value="@selectedEmployee?.Position" id="position" class="form-control "placeholder="Position">
+    </div>
+    <div class="row m-1">
+      <label for="datehired" class="input-group-text input-group-sm form-label">Date Hired:</label>
+      <input type="date" value="@selectedEmployee?.DateHired" class="form-control" id="datehired">
+    </div>
+    @*<div class="row m-1">
+            <label for="" class="input-group-text input-group-sm form-label">Name:</label>
+            @if (selectedReservation != null)
             {
-              <option value="@e.FirstName">@e.FirstName @e.LastName</option>
+              <input type="text" placeholder="Name" class="form-control" id="name" @bind="selectedReservation.Name">
             }
-          </select>
-        </div>
-      </div>
+            else
+            {
+              <input type="text" placeholder="Name" class="form-control" id="name" disabled>
+            }
+          </div>
+          <div class="row m-1">
+            <label for="citizenship" class="input-group-text input-group-sm form-label">Citizenship:</label>
+            @if (selectedReservation != null)
+            {
+              <input type="text" placeholder="Citizenship" class="form-control" id="citizenship" @bind="selectedReservation.Citizenship">
+            }
+            else
+            {
+              <input type="text" placeholder="Citizenship" class="form-control" id="citizenship" disabled>
+            }
+          </div>
+          <div class="row m-1">
+            <label for="isActive" class="input-group-text input-group-sm form-label">Status:</label>
+            <select class="form-select form-select-sm" @bind="updatedReservationStatus">
+              @if (selectedReservation != null)
+            {
+              if (selectedReservation.IsActive)
+                {
+                  <option selected value="true">Active</option>
+                  <option value="false">Inactive</option>
+                }
+                else
+                {
+                  <option selected value="false">Inactive</option>
+                  <option value="true">Active</option>
+                }
+              }
+              else
+              {
+                <input type="text" placeholder="Active" class="form-control" id="isActive" readonly>
+              }
+            </select>*@
+    @*</div>*@
+    <div class="row m-1">
+      <button class="btn btn-primary btn-sm w-100 btn-block" type="button">Update</button>
+    </div>
+  </form>
+</div>
+
 
 @code {
   string firstName;
   string lastName;
   List<HourlyEmployee> listOfEmployees;
   List<HourlyEmployee> matchingEmployees = new();
+  int matchingEmployeeId;
+  HourlyEmployee selectedEmployee => SelectedEmployee();
 
   protected override void OnInitialized()
   {
@@ -69,8 +141,8 @@
     else
     {
       matchingEmployees.AddRange(listOfEmployees.Where
-        (employee => (string.IsNullOrEmpty(firstName) || employee.FirstName == firstName) &&
-                     (string.IsNullOrEmpty(lastName) || employee.LastName == lastName)));
+        (employee => (string.IsNullOrEmpty(firstName) || employee.FirstName == firstName.ToLower().Trim()) &&
+                     (string.IsNullOrEmpty(lastName) || employee.LastName == lastName.ToLower().Trim())));
     }
 
     if (matchingEmployees.Count == 0) App.Current.MainPage.DisplayAlert("No results found", "No matching results", "Close");
@@ -78,5 +150,16 @@
     firstName = null;
     lastName = null;
 
+  }
+
+  private HourlyEmployee SelectedEmployee()
+  {
+    if (listOfEmployees == null)
+    {
+  // Handle the case where the list is null
+      return null;
+    }
+
+    return listOfEmployees.FirstOrDefault(employee => employee.Id == matchingEmployeeId);
   }
 }
