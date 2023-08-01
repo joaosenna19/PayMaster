@@ -1,6 +1,6 @@
 ﻿@page "/edit"
 @using PayMaster.Data
-<h3>Edit</h3>
+@inject IJSRuntime JSRuntime
 
 <!-- Employee search -->
 <div class="container-fluid">
@@ -27,6 +27,8 @@
 </div>
 
 <!-- Display results -->
+<div class="row my-y">
+<form class="d-flex flex-column my-1">
 <div>
   <div class="row my-2">
     <h2 class="text-center">Employees</h2>
@@ -43,74 +45,62 @@
 </div>
 
 <!-- Display employee information -->
-<div class="row my-y">\
-  <form class="d-flex flex-column my-1">
-    <div class="row m-1">
-      <label for="firstname" class="input-group-text input-group-sm form-label">First Name:</label>
-      <input type="text" value="@selectedEmployee?.FirstName" placeholder="First Name" class="form-control" id="firstname" readonly>
-    </div>
-    <div class="row m-1">
-      <label for="lastname" class="input-group-text input-group-sm form-label">Last Name:</label>
-      <input type="text" value="@selectedEmployee?.LastName" placeholder="Last name" class="form-control" id="lastname" readonly>
-    </div>
-    <div class="row m-1">
-      <label for="position" class="input-group-text input-group-sm form-label">Position:</label>
-      <input type="text" value="@selectedEmployee?.Position" id="position" class="form-control "placeholder="Position">
-    </div>
-    <div class="row m-1">
+
+<div class="row m-1">
+  <label for="firstname" class="input-group-text input-group-sm form-label">First Name:</label>
+  <input type="text" value="@selectedEmployee?.FirstName" placeholder="First Name" class="form-control" id="firstname" readonly>
+</div>
+<div class="row m-1">
+  <label for="lastname" class="input-group-text input-group-sm form-label">Last Name:</label>
+  <input type="text" value="@selectedEmployee?.LastName.ToUpper()" placeholder="Last name" class="form-control" id="lastname" readonly>
+</div>
+<div class="row m-1">
       <label for="datehired" class="input-group-text input-group-sm form-label">Date Hired:</label>
-      <input type="date" value="@selectedEmployee?.DateHired" class="form-control" id="datehired">
+      <input type="date" bind="@selectedEmployee?.DateHired.ToString("yyyy-MM-dd")" class="form-control" id="datehired" readonly>
     </div>
-    @*<div class="row m-1">
-            <label for="" class="input-group-text input-group-sm form-label">Name:</label>
-            @if (selectedReservation != null)
-            {
-              <input type="text" placeholder="Name" class="form-control" id="name" @bind="selectedReservation.Name">
-            }
-            else
-            {
-              <input type="text" placeholder="Name" class="form-control" id="name" disabled>
-            }
-          </div>
-          <div class="row m-1">
-            <label for="citizenship" class="input-group-text input-group-sm form-label">Citizenship:</label>
-            @if (selectedReservation != null)
-            {
-              <input type="text" placeholder="Citizenship" class="form-control" id="citizenship" @bind="selectedReservation.Citizenship">
-            }
-            else
-            {
-              <input type="text" placeholder="Citizenship" class="form-control" id="citizenship" disabled>
-            }
-          </div>
-          <div class="row m-1">
-            <label for="isActive" class="input-group-text input-group-sm form-label">Status:</label>
-            <select class="form-select form-select-sm" @bind="updatedReservationStatus">
-              @if (selectedReservation != null)
-            {
-              if (selectedReservation.IsActive)
-                {
-                  <option selected value="true">Active</option>
-                  <option value="false">Inactive</option>
-                }
-                else
-                {
-                  <option selected value="false">Inactive</option>
-                  <option value="true">Active</option>
-                }
-              }
-              else
-              {
-                <input type="text" placeholder="Active" class="form-control" id="isActive" readonly>
-              }
-            </select>*@
-    @*</div>*@
-    <div class="row m-1">
-      <button class="btn btn-primary btn-sm w-100 btn-block" type="button">Update</button>
-    </div>
+<div class="row m-1">
+  <label for="hourly_rate" class="input-group-text input-group-sm form-label">Hourly Rate:</label>
+  @if (selectedEmployee != null)
+  {
+    <input type="number" id="hourly_rate_selected" name="hourly_rate" min="0.01" step="0.01" class="form-control" required @bind="@selectedEmployee.HourlyRate">
+  }
+  else
+  {
+    <input type="number" id="hourly_rate_placeholder" name="hourly_rate" min="0.01" step="0.01" class="form-control" placeholder="Hourly Rate">
+  }
+      
+</div>
+<div class="row m-1">
+  <label for="position" class="input-group-text input-group-sm form-label">Position:</label>
+  @if (selectedEmployee != null)
+    {
+      <input type="text" id="position" name="position" class="form-control" required @bind="@selectedEmployee.Position">
+    }
+    else
+    {
+      <input type="text" id="position_placeholder" class="form-control" name="position" placeholder="Position">
+    }
+     
+</div>
+<div class="row m-1">
+  <button class="btn btn-primary btn-sm w-100 btn-block" type="button" onclick="@UpdateEmployee">Update employee</button>
+</div>
+<div class="row m-1">
+  <button class="btn btn-warning btn-sm w-100 btn-block" type="submit" onclick="@FireEmployee">Fire employee</button>
+</div>
+<div class="row m-1">
+  <button class="btn btn-danger btn-sm w-100 btn-block" type="submit" onclick="@DeleteEmployee">Delete employee</button>
+</div>
+
   </form>
 </div>
 
+@if (selectedEmployee != null)
+{
+  <p>@selectedEmployee.IsActive</p>
+  <p>@selectedEmployee.DateFired</p>
+
+}
 
 @code {
   string firstName;
@@ -161,5 +151,43 @@
     }
 
     return listOfEmployees.FirstOrDefault(employee => employee.Id == matchingEmployeeId);
+  }
+
+  private async void DeleteEmployee()
+  {
+    if (selectedEmployee == null)
+    {
+      App.Current.MainPage.DisplayAlert("No employee selected", "Please select a employee first.", "Close");
+      return;
+    }
+    await App.Repo.DeleteEmployee(selectedEmployee);
+    App.Current.MainPage.DisplayAlert("Sucess", App.Repo.StatusMessage, "Close");
+    JSRuntime.InvokeVoidAsync("location.reload");
+    
+  }
+
+  private void FireEmployee()
+  {
+    if (selectedEmployee == null)
+    {
+      App.Current.MainPage.DisplayAlert("No employee selected", "Please select a employee first.", "Close");
+      return;
+    }
+    selectedEmployee.DateFired = DateTime.Today;
+    selectedEmployee.IsActive = false;
+    UpdateEmployee();
+  }
+  
+  private async void UpdateEmployee()
+  {
+    if (selectedEmployee == null)
+    {
+      App.Current.MainPage.DisplayAlert("No employee selected", "Please select a employee first.", "Close");
+      return;
+    }
+
+    await App.Repo.UpdateEmployee(selectedEmployee);
+    App.Current.MainPage.DisplayAlert("Sucess", App.Repo.StatusMessage, "Close");
+    JSRuntime.InvokeVoidAsync("location.reload");
   }
 }

@@ -21,7 +21,7 @@
       </div>
       <div class="row m-4">
         <label for="date_hired" class="input-group-text input-group-sm form-label">Date Hired:</label>
-        <input type="date" id="date_hired" name="date_hired" placeholder="YYYY/MM/DD" min="2022-01-01" class="form-control" required @bind="dateHired">
+        <input type="date" id="date_hired" name="date_hired"  min="2022-01-01" max="2023-08-01" class="form-control" required @bind="dateHired">
       </div>
       <div class="row m-4">
         <label for="hourly_rate" class="input-group-text input-group-sm form-label">Hourly Rate:</label>
@@ -53,7 +53,8 @@
       LastName = lastName.ToLower().Trim(),
       Position = position.ToLower().Trim(),
       DateHired = dateHired,
-      HourlyRate = hourlyRate
+      HourlyRate = hourlyRate,
+      IsActive = true
     };
     await App.Repo.CreateEmployee(newEmployee);
     App.Current.MainPage.DisplayAlert("Sucess", App.Repo.StatusMessage, "Close");

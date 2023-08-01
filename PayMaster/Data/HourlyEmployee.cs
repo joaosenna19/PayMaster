@@ -11,7 +11,7 @@ public class HourlyEmployee
     public string Position { get; set; }
     public bool IsActive { get; set; }
     public DateTime DateHired { get; set; }
-    public DateTime DateFired { get; set; }
+    public DateTime? DateFired { get; set; }
     public double HourlyRate { get; set; }
     
 }

@@ -51,14 +51,34 @@ namespace PayMaster.Data;
             }
         }
 
-        public async Task<int> UpdateEmployee(HourlyEmployee account)
+        public async Task<int> UpdateEmployee(HourlyEmployee employee)
         {
-            return await _database.UpdateAsync(account);
+            try
+            {
+                await Init();
+                StatusMessage = $"{employee.FirstName} {employee.LastName} updated.";
+                return await _database.UpdateAsync(employee);
+            }
+            catch (Exception e)
+            {
+                StatusMessage = $"Failed to update {employee.FirstName + employee.LastName}. Error {e}";
+                return 0;
+            }
         }
 
-        public async Task<int> DeleteEmployee(HourlyEmployee account)
+        public async Task<int> DeleteEmployee(HourlyEmployee employee)
         {
-            return await _database.DeleteAsync(account);
+            try
+            {
+                await Init();
+                StatusMessage = $"{employee.FirstName} {employee.LastName} deleted.";
+                return await _database.DeleteAsync(employee);
+            }
+            catch (Exception e)
+            {
+                StatusMessage = $"Failed to delete {employee.FirstName + employee.LastName}. Error {e}";
+                return 0;
+            }
         }
         
     }
