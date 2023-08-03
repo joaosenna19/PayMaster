@@ -1,4 +1,6 @@
-﻿@page "/"
+﻿@*Blazor page responsible for adding an employee to the database*@
+
+@page "/"
 @using PayMaster.Data
 
 <div class="container-fluid">
@@ -43,7 +45,7 @@
   string position;
   DateTime dateHired;
   double hourlyRate;
-  List<HourlyEmployee>? listOfEmployees;
+
   
   private async void AddEmployee()
   {

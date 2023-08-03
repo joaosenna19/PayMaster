@@ -1,4 +1,7 @@
-﻿using SQLite;
+﻿//Class responsible for the connection with the database file and all the methods to manipulate
+// data across the application
+
+using SQLite;
 
 namespace PayMaster.Data;
     public class HourlyEmployeeRepository
@@ -6,6 +9,7 @@ namespace PayMaster.Data;
         
         private SQLiteAsyncConnection _database;
         private string _dbPath;
+        //stores the status of the system after a method is called and executed
         public string StatusMessage { get; private set; }
 
 

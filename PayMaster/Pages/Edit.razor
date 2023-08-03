@@ -1,4 +1,6 @@
-﻿@page "/edit"
+﻿@*Blazor page that handles all the editing of a employee *@
+
+@page "/edit"
 @using PayMaster.Data
 @inject IJSRuntime JSRuntime
 
@@ -117,7 +119,7 @@
   private void SearchEmployee()
   {
     matchingEmployees.Clear();
-
+  //Add all employees if the search fields are empty
     if (string.IsNullOrEmpty(firstName) && string.IsNullOrEmpty(lastName))
     {
       matchingEmployees.AddRange(listOfEmployees);
@@ -150,6 +152,7 @@
     }
     await App.Repo.DeleteEmployee(selectedEmployee);
     App.Current.MainPage.DisplayAlert("Sucess", App.Repo.StatusMessage, "Close");
+    //Reloads the page
     JSRuntime.InvokeVoidAsync("location.reload");
     
   }
@@ -176,6 +179,7 @@
 
     await App.Repo.UpdateEmployee(selectedEmployee);
     App.Current.MainPage.DisplayAlert("Sucess", App.Repo.StatusMessage, "Close");
+  //Reloads the page
     JSRuntime.InvokeVoidAsync("location.reload");
   }
 }

@@ -11,7 +11,7 @@ public partial class App : Application
         InitializeComponent();
 
         MainPage = new MainPage();
-
+        //initializes the repository, being accessible through the whole app 
         Repo = repo;
     }
 }

@@ -20,6 +20,7 @@ public static class MauiProgram
         builder.Services.AddBlazorWebViewDeveloperTools();
         builder.Logging.AddDebug();
 #endif
+        //Singleton for the Database connection
         var dbPath = Path.Combine(FileSystem.AppDataDirectory, "employees.db");
         builder.Services.AddSingleton(s => ActivatorUtilities.CreateInstance<HourlyEmployeeRepository>(s, dbPath));
         return builder.Build();

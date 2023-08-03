@@ -1,4 +1,7 @@
-﻿using SQLite;
+﻿// Base class of the whole project
+// Responsible for storing all the information regarding the employee
+
+using SQLite;
 
 namespace PayMaster.Data;
 

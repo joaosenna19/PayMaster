@@ -1,4 +1,6 @@
-﻿@page "/Calculate"
+﻿@*Blazor page responsible for calculating employees' salary bi-weekly*@
+
+@page "/Calculate"
 @using PayMaster.Data
 
 <div class="container-fluid">
@@ -88,6 +90,7 @@
   double hoursWorked;
   double salary;
   
+  //Renders all the employees as soon as the page is open
   protected override void OnInitialized()
   {
     GetAllEmployees();
@@ -101,7 +104,7 @@
   private void SearchEmployee()
   {
     matchingEmployees.Clear();
-
+    //Add all employees in case the search fields are empty
     if (string.IsNullOrEmpty(firstName) && string.IsNullOrEmpty(lastName))
     {
       matchingEmployees.AddRange(listOfEmployees);
@@ -132,7 +135,7 @@
       App.Current.MainPage.DisplayAlert("No employee selected", "Please select a employee first.", "Close");
       return;
     }
-
+    // Displays a message to the user that the employee is fired 
     if (selectedEmployee.IsActive == false)
     {
       App.Current.MainPage.DisplayAlert("Fired employee", "The selected employee is no longer working for you.", "Close");
